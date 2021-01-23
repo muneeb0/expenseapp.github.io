@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+	<style>
+	body{
+	background-color: cadetblue;
+	font-family: sans-serif, Geneva, Tahoma, sans-serif;
+    color: darkgray;
+	}
+	#Box{
+	height:600px;
+	width:400px;
+	margin:0 auto;
+	border:solid 1px thistle;
+	box-shadow: 2px 2px 7px lightblue;
+	background-color:darkcyan;
+	}
+    #controlBox{
+        width:400px;
+	margin:0 auto;
+	box-shadow: 2px 2px 7px lightblue;
+	background-color:darkcyan;
+    }
+	label
+	{
+	font-size:20px;
+	font-weight:500;
+	}
+    ul li{
+        list-style: none;
+    }
+	</style>
+</head>
+
+<body>
+<h1 style="text-align:center;">Expense Calcualtor</h1>
+<div id="Box">
+    <h3 style="margin-left: 70px;">Salary:</h3>
+    <input type="number" id="income"  placeholder="Enter your salary" class="form form-control" style=" margin-left:60px; width: 50%; float: left; ">
+    <button onclick="addIncome()" class=" btn btn-primary" style="float: left;margin-left: 10px; ">Add Income</button>
+    <h4 id="currentIncome" style="margin-top:10px; margin-left:60px; "></h4>
+    <div id="expenseForm" style="margin-top:10px; margin-left:60px; ">
+      
+        <label style="margin-top: 10px;"><u>Expense:</u> <br />
+            <input type="number" id="expense" placeholder="Enter yout expense"  class="form form-control" style="margin-top:10px; width: 60%; float: left; "/>
+        <button onclick="addExpense()" class="btn btn-primary " style="float: left; margin-top:10px; margin-left: 10px; ">Add Expense</button>
+        </label> <br />
+        <label>
+            Category:
+            <select id="category" class="btn btn-primary dropdown-toggle" style=" width: 110px; margin-left: 105px;">
+                <option value="food">Food</option>
+                <option value="bike">Bike</option>
+                <option value="rent">Rent</option>
+            </select>
+        </label>
+        <br /><label style="margin-top: 30px;">
+           <u>
+            Show Expense : </u><br>
+            <select id="showExpense" class="btn btn-primary dropdown-toggle" style="width: 210px;"  onchange="showFilterExpense()">
+                <option value="all">All</option>
+                <option value="food">Food</option>
+                <option value="bike">Bike</option>
+                <option value="rent">Rent</option>
+            </select>
+        </label>
+         <input type="date" class="form form-control" style="width: 62%;" id="myDate"/>
+    
+    <br><label><u>Transactions</u></label>
+    <ul id="expenses" onclick="select()">
+
+    </ul>
+
+    </div>
+</div>
+     <div id="controlBox" >
+        <input type="text" class="form form-control" style="  width: 70%; float: left; " id="item" >
+        <button class=" btn btn-primary" style="float: left;margin-left: 10px; width: 20%; " onclick="Edit()">Edit</button>
+    </div>
+    <script>
+        var saving = 100;
+        var list = document.getElementById("expenses");
+        var expenses = [];
+        var txtval
+
+        function Expense (expense, category,time) {
+            this.expense = expense;
+            this.category = category;
+            this.time = time;
+        }
+        function addIncome() {
+            saving += parseInt(document.getElementById("income").value)
+           showIncome()
+           document.getElementById("income").value=""
+        }
+
+        function showIncome () {
+            document.getElementById("currentIncome").innerText = "Saving " + saving
+        }
+
+
+        function addExpense() {
+            var expense =  document.getElementById("expense");
+            var category = document.getElementById("category");
+            var rightNow = new Date();
+            var rightNow = rightNow.getFullYear()+"-"+(rightNow.getMonth()+1)+"-"+rightNow.getDate()
+            var newExpense = new Expense(parseInt(expense.value), category.value,rightNow)
+            expenses.push(newExpense)
+            saving -= parseInt(expense.value)
+            showIncome()
+            console.log(expenses)
+            renderItem()
+        }
+
+        function renderItem () {
+            var item = "";
+            for(var i = 0; i < expenses.length;i++) {
+                item += "<li>" + expenses[i].expense + " - " + expenses[i].category +" - " + expenses[i].time +"</li>"
+            }
+            list.innerHTML = item
+        }
+        
+
+        function showFilterExpense() {
+            var category = document.getElementById("showExpense").value;
+            var da = document.getElementById("myDate").value;
+            console.log(da)
+            var item = "";
+            for(var i = 0; i < expenses.length;i++) {
+                if(category === "all" && da == expenses[i].time ) {
+                    item += "<li>" + expenses[i].expense + " - " + expenses[i].category + " - " + expenses[i].time +"</li>"
+                } else if(category ===  expenses[i].category  && da == expenses[i].time ) {
+                    item += "<li>" + expenses[i].expense + " - " + expenses[i].category + " - " + expenses[i].time +"</li>"
+                }
+            }
+            list.innerHTML = item
+        }
+
+        
+function select() {
+    var list = document.querySelector('ul');
+    list.addEventListener('click', function(ev) {
+      if (ev.target.tagName === 'LI'){
+      console.log(ev.target.value)
+        document.getElementById("item").value = ev.target.innerHTML; 
+        txtval = document.getElementById("item").value = ev.target.innerHTML; 
+        }
+    }, false);
+  }
+
+  function Edit(){
+    var a = document.getElementById("item").value
+    for (let index = 0; index < expenses.length; index++) {
+        if (txtval == expenses[index]) {
+            expenses[index]= a
+        }
+    }
+    document.getElementById("item").value =""
+    renderItem();
+  }
+
+    </script>
+</body>
+
+</html>
